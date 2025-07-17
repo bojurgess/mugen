@@ -23,7 +23,7 @@ services:
             - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock:ro
-            - ./data/traefik:/letsencrypt
+            - ./data/traefik/acme.json:/letsencrypt/acme.json
         labels:
             - "traefik.enable=true"
             - "traefik.http.routers.traefik.rule=Host(`traefik.beno.lol`)"
