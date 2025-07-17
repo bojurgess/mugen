@@ -12,15 +12,12 @@ services:
             - "--log.level=DEBUG"
             - "--api=true"
             - "--api.dashboard=true"
-            - "--entrypoints.web.address=:80"
-            - "--entrypoints.websecure.address=:443"
-            - "--providers.docker=true"
-            - "--providers.docker.exposedByDefault=false"
         ports:
             - "80:80"
             - "443:443"
         environment:
             - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
+            - TRAEFIK_AUTH_HASH=${TRAEFIK_AUTH_HASH}
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock:ro
             - ./data/traefik/acme.json:/letsencrypt/acme.json
@@ -31,6 +28,8 @@ services:
             - "traefik.http.routers.traefik.tls=true"
             - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
             - "traefik.http.routers.traefik.service=api@internal"
+            - "traefik.http.routers.traefik.middlewares=auth"
+            - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_AUTH_HASH}"
         networks:
             - traefik
 
