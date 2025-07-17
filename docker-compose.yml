@@ -26,10 +26,12 @@ services:
         container_name: whoami
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.whoami.rule=Host(`whoami.beno.lol`)"
+            - "traefik.http.routers.whoami.rule=Host(`mc.beno.lol`) && PathPrefix(`/whoami`)"
             - "traefik.http.routers.whoami.entrypoints=websecure"
             - "traefik.http.routers.whoami.tls=true"
             - "traefik.http.routers.whoami.tls.certresolver=cloudflare"
+            - "traefik.http.routers.whoami.middlewares=strip-whoami"
+            - "traefik.http.middlewares.strip-foo.stripPrefix.prefixes=/whoami"
         networks:
             - traefik
 
