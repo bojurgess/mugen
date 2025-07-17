@@ -28,6 +28,7 @@ services:
             - "traefik.enable=true"
             - "traefik.http.routers.whoami.rule=Host(`whoami.beno.lol`)"
             - "traefik.http.routers.whoami.entrypoints=websecure"
+            - "traefik.http.routers.whoami.tls=true"
             - "traefik.http.routers.whoami.tls.certresolver=cloudflare"
         networks:
             - traefik
