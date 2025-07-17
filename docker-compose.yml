@@ -32,6 +32,8 @@ services:
             - "traefik.http.routers.whoami.tls.certresolver=cloudflare"
             - "traefik.http.routers.whoami.middlewares=strip-whoami"
             - "traefik.http.middlewares.strip-whoami.stripPrefix.prefixes=/whoami"
+        ports:
+            - "8080:80"
         networks:
             - traefik
 
