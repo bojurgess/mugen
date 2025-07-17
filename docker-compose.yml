@@ -6,6 +6,11 @@ services:
             - ./config/traefik/dynamic:/etc/traefik/dynamic:ro
             - ./data/traefik:/letsencrypt
             - /var/run/docker.sock:/var/run/docker.sock:ro
+        labels:
+            - "traefik.http.routers.api.rule=Host(`traefik.beno.lol`)"
+            - "traefik.http.routers.api.service=api@internal"
+            - "traefik.http.routers.api.entrypoints=websecure"
+            - "traefik.http.routers.api.tls.certresolver=cloudflare"
         ports:
             - "80:80"
             - "443:443"
