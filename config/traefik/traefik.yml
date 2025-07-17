@@ -1,0 +1,29 @@
+entryPoints:
+    web:
+        address: ":80"
+
+    websecure:
+        address: ":443"
+
+providers:
+    docker:
+        exposedByDefault: false
+
+    file:
+        directory: /etc/traefik/dynamic
+        watch: true
+
+certificatesResolvers:
+    cloudflare:
+        acme:
+            email: benodragon@outlook.com
+            storage: /letsencrypt/acme.json
+            dnsChallenge:
+                provider: cloudflare
+
+log:
+    level: INFO
+    format: common # can be 'common', 'json'
+
+accessLog:
+    format: common

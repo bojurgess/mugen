@@ -1,0 +1,14 @@
+http:
+    routers:
+        whoami:
+            rule: "Host(`whoami.beno.lol`)"
+            entryPoints: ["websecure"]
+            service: whoami
+            tls:
+                certResolver: cloudflare
+
+    services:
+        whoami:
+            loadBalancer:
+                servers:
+                    - url: "http://whoami:80"
