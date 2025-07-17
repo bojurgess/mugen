@@ -1,27 +1,34 @@
 services:
     traefik:
         image: traefik:v3.0
-        volumes:
-            - ./config/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-            - ./config/traefik/dynamic:/etc/traefik/dynamic:ro
-            - ./data/traefik:/letsencrypt
-            - /var/run/docker.sock:/var/run/docker.sock:ro
-        labels:
-            - "traefik.http.routers.api.rule=Host(`traefik.beno.lol`)"
-            - "traefik.http.routers.api.service=api@internal"
-            - "traefik.http.routers.api.entrypoints=websecure"
-            - "traefik.http.routers.api.tls.certresolver=cloudflare"
+        command:
+            - "--entrypoints.web.address=:80"
+            - "--entrypoints.websecure.address=:443"
+            - "--providers.docker=true"
+            - "--providers.docker.exposedByDefault=false"
+            - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
+            - "--certificatesresolvers.cloudflare.acme.email=bojurgess@gmail.com"
+            - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
+            - "--log.level=DEBUG"
         ports:
             - "80:80"
             - "443:443"
         environment:
             - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./data/traefik:/letsencrypt
         networks:
             - traefik
 
     whoami:
         image: traefik/whoami
         container_name: whoami
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.whoami.rule=Host(`whoami.beno.lol`)"
+            - "traefik.http.routers.whoami.entrypoints=websecure"
+            - "traefik.http.routers.whoami.tls.certresolver=cloudflare"
         networks:
             - traefik
 
