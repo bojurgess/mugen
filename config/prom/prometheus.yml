@@ -1,0 +1,35 @@
+global:
+    scrape_interval: 15s
+    evaluation_interval: 15s
+
+scrape_configs:
+    # Prometheus itself
+    - job_name: "prometheus"
+      static_configs:
+          - targets: ["localhost:9090"]
+
+    # Minecraft server metrics
+    - job_name: "smp"
+      static_configs:
+          - targets: ["smp-fabric:9100"]
+      scrape_interval: 15s
+      metrics_path: "/metrics"
+
+    # Velocity proxy metrics
+    - job_name: "velocity-proxy"
+      static_configs:
+          - targets: ["velocity:9100"]
+      scrape_interval: 15s
+      metrics_path: "/metrics"
+
+    # Node Exporter for system metrics
+    - job_name: "node-exporter"
+      static_configs:
+          - targets: ["node-exporter:9100"]
+      scrape_interval: 15s
+
+    # cAdvisor for container metrics
+    - job_name: "cadvisor"
+      static_configs:
+          - targets: ["cadvisor:8080"]
+      scrape_interval: 15s

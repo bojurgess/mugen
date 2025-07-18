@@ -1,13 +1,15 @@
 services:
     traefik:
+        container_name: traefik
         image: traefik:v3.0
+        restart: unless-stopped
         command:
             - "--entrypoints.web.address=:80"
             - "--entrypoints.websecure.address=:443"
             - "--providers.docker=true"
             - "--providers.docker.exposedByDefault=false"
             - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
-            - "--certificatesresolvers.cloudflare.acme.email=bojurgess@gmail.com"
+            - "--certificatesresolvers.cloudflare.acme.email=${EMAIL}"
             - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
             - "--log.level=DEBUG"
             - "--api=true"
@@ -23,7 +25,7 @@ services:
             - ./data/traefik/acme.json:/letsencrypt/acme.json
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.traefik.rule=Host(`traefik.beno.lol`)"
+            - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)"
             - "traefik.http.routers.traefik.entrypoints=websecure"
             - "traefik.http.routers.traefik.tls=true"
             - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
@@ -31,24 +33,181 @@ services:
             - "traefik.http.routers.traefik.middlewares=auth"
             - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_AUTH_HASH}"
         networks:
-            - traefik
+            - mugen_net
 
-    whoami:
-        image: traefik/whoami
-        container_name: whoami
+    velocity:
+        image: itzg/mc-proxy
+        container_name: velocity
+        restart: unless-stopped
+        environment:
+            TYPE: VELOCITY
+            VELOCITY_VERSION: 3.4.0-SNAPSHOT
+            VELOCITY_BUILD_ID: LATEST
+            MEMORY: 1G
+            PLUGINS: |
+                https://github.com/Cubxity/UnifiedMetrics/releases/download/v0.3.8/unifiedmetrics-platform-velocity-0.3.8.jar
+                https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/velocity
+                https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/velocity
+        ports:
+            - "25565:25565"
+            - "19132:19132"
+        volumes:
+            - ./config/velocity/velocity.toml:/config/velocity.toml:ro
+            - ./data/velocity/forwarding.secret:/config/forwarding.secret:ro
+            - ./config/velocity/plugins/bStats:/server/plugins/bStats
+            - ./config/velocity/plugins/floodgate:/server/plugins/floodgate
+            - ./config/velocity/plugins/Geyser-Velocity:/server/plugins/Geyser-Velocity
+            - ./config/velocity/plugins/unifiedmetrics:/server/plugins/unifiedmetrics
+        networks:
+            - mugen_net
+        depends_on:
+            - smp
+
+    smp:
+        image: itzg/minecraft-server:java24
+        container_name: smp-fabric
+        restart: unless-stopped
+        environment:
+            EULA: "TRUE"
+            TYPE: FABRIC
+            VERSION: "1.21.7"
+            FABRIC_LOADER_VERSION: LATEST
+            MEMORY: 10G
+            GAMEMODE: survival
+            ONLINE_MODE: "false"
+            ENABLE_RCON: "true"
+            RCON_PASSWORD: ${RCON_PASSWORD}
+            RCON_PORT: 25575
+            # Mods to be installed
+            MODS: |
+                https://github.com/Cubxity/UnifiedMetrics/releases/download/v0.3.8/unifiedmetrics-platform-fabric-0.3.8.jar
+            MODRINTH_PROJECTS: |
+                carpet:1.4.177
+                lithium:mc1.21.7-0.18.0-fabric
+                ferrite-core:8.0.0-fabric
+                krypton:0.2.9
+                vmp-fabric:0.2.0+beta.7.202+1.21.7
+                chunky:1.4.40
+                leaves-be-gone:v21.7.0-1.21.7-Fabric
+                structure-layout-optimizer:1.1.1+1.21.6-fabric
+                scalablelux:0.1.5+fabric.e4acdcb
+                c2me-fabric:0.3.4+beta.1.0+1.21.7
+                fabric-api:0.129.0+1.21.7
+                fabric-language-kotlin:1.13.4+kotlin.2.2.0
+                puzzles-lib:v21.7.1-1.21.7-Fabric
+                resourceful-config:3.7.0
+                forge-config-api-port:v21.7.0-1.21.7-Fabric
+                fabricproxy-lite:v2.9.0
+                floodgate:2.2.5-b45
+        volumes:
+            - ./config/smp/server.properties:/data/server.properties
+            - ./data/smp:/data
+            - ./config/smp:/data/config
+            - ./data/velocity:/data/velocity
+        networks:
+            - mugen_net
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.whoami.rule=Host(`mc.beno.lol`) && PathPrefix(`/whoami`)"
-            - "traefik.http.routers.whoami.entrypoints=websecure"
-            - "traefik.http.routers.whoami.tls=true"
-            - "traefik.http.routers.whoami.tls.certresolver=cloudflare"
-            - "traefik.http.routers.whoami.middlewares=strip-whoami"
-            - "traefik.http.middlewares.strip-whoami.stripPrefix.prefixes=/whoami"
-        ports:
-            - "8080:80"
+            - "traefik.http.routers.bluemap.rule=Host(`mc.${DOMAIN}`) && PathPrefix(`/map`)"
+            - "traefik.http.routers.bluemap.entrypoints=websecure"
+            - "traefik.http.routers.bluemap.tls=true"
+            - "traefik.http.routers.bluemap.tls.certresolver=cloudflare"
+            - "traefik.http.routers.bluemap.middlewares=strip-map"
+            - "traefik.http.middlewares.strip-map.stripPrefix.prefixes=/map"
+            - "traefik.http.services.bluemap.loadbalancer.server.port=8100"
+
+    xbox-broadcast:
+        image: ghcr.io/mcxboxbroadcast/standalone:latest
+        container_name: xbox-broadcast
+        restart: unless-stopped
+        volumes:
+            - ./config/xbox_broadcast/:/opt/app/config/
         networks:
-            - traefik
+            - mugen_net
+
+    prom:
+        image: prom/prometheus:latest
+        container_name: prom
+        restart: unless-stopped
+        volumes:
+            - ./config/prom:/etc/prometheus
+            - ./data/prom:/prometheus
+        command:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus"
+            - "--web.console.libraries=/etc/prometheus/console_libraries"
+            - "--web.console.templates=/etc/prometheus/consoles"
+            - "--storage.tsdb.retention.time=200h"
+            - "--web.enable-lifecycle"
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.prometheus.rule=Host(`prom.${DOMAIN}`)"
+            - "traefik.http.routers.prometheus.entrypoints=websecure"
+            - "traefik.http.routers.prometheus.tls.certresolver=cloudflare"
+            - "traefik.http.routers.prometheus.middlewares=auth"
+            - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+        networks:
+            - mugen_net
+
+    grafana:
+        image: grafana/grafana-oss:latest
+        container_name: grafana
+        restart: unless-stopped
+        environment:
+            - GF_SECURITY_ADMIN_USER=admin
+            - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+        volumes:
+            - ./data/grafana:/var/lib/grafana
+            - ./config/grafana:/etc/grafana
+        networks:
+            - mugen_net
+        depends_on:
+            - prom
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)"
+            - "traefik.http.routers.grafana.entrypoints=websecure"
+            - "traefik.http.routers.grafana.tls.certresolver=cloudflare"
+            - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+    node-exporter:
+        image: prom/node-exporter:latest
+        container_name: node-exporter
+        restart: unless-stopped
+        volumes:
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+        command:
+            - "--path.procfs=/host/proc"
+            - "--path.rootfs=/rootfs"
+            - "--path.sysfs=/host/sys"
+            - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($|/)"
+        networks:
+            - mugen_net
+
+    cadvisor:
+        image: gcr.io/cadvisor/cadvisor:latest
+        container_name: cadvisor
+        restart: unless-stopped
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:ro
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+            - /dev/disk/:/dev/disk:ro
+        devices:
+            - /dev/kmsg
+        privileged: true
+        networks:
+            - mugen_net
 
 networks:
-    traefik:
+    mugen_net:
         driver: bridge
+
+volumes:
+    smp_data:
+    velocity_data:
+    prometheus_data:
+    grafana_data:
