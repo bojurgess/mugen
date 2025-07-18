@@ -1,5 +1,6 @@
 mode: "HTTP"
 http:
+<<<<<<< HEAD
   host: "0.0.0.0"
   port: 9100
   authentication:
@@ -14,3 +15,19 @@ pushGateway:
     username: "username"
     password: "password"
   interval: 10
+=======
+    host: "smp"
+    port: 9100
+    authentication:
+        scheme: "NONE"
+        username: "username"
+        password: "password"
+pushGateway:
+    job: "unifiedmetrics"
+    url: "http://pushgateway:9091"
+    authentication:
+        scheme: "NONE"
+        username: "username"
+        password: "password"
+    interval: 10
+>>>>>>> 1ae7836bd65a5ec5760f8f94d1a498c31057e5fc
