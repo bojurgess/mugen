@@ -3,3 +3,10 @@
 
 logs/
 data/
+
+*.jar
+*.pem
+
+**/*/cache
+**/*/.var-list-manifest.json
+**/*/forwarding.secret
