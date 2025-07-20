@@ -16,11 +16,11 @@ session:
 
     # The data to broadcast over xbox live, this is the default if querying is enabled
     session-info:
-        host-name: "Geyser Test Server"
-        world-name: "\u00A7aGeyserMC \u00A7bDemo \u00A7f& \u00A7cTest \u00A7fServer"
+        host-name: "beno.lol"
+        world-name: "\u00A7aShow \u00A7bme \u00A7f& \u00A7cyour \u00A7fwilly!"
         players: 0
-        max-players: 20
-        ip: mc.beno.lol
+        max-players: 42069
+        ip: velocity
         port: 19132
 
 # Friend/follower list sync settings
