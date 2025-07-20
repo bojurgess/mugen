@@ -1,19 +1,4 @@
 server:
-<<<<<<< HEAD
-  name: "smp"
-metrics:
-  enabled: true
-  driver: "prometheus"
-  collectors:
-    systemGc: true
-    systemMemory: true
-    systemProcess: true
-    systemThread: true
-    server: true
-    world: true
-    tick: true
-    events: true
-=======
     name: "smp"
 metrics:
     enabled: true
@@ -27,4 +12,3 @@ metrics:
         world: true
         tick: true
         events: true
->>>>>>> 1ae7836bd65a5ec5760f8f94d1a498c31057e5fc
