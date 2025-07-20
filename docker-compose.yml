@@ -44,6 +44,7 @@ services:
             VELOCITY_VERSION: 3.4.0-SNAPSHOT
             VELOCITY_BUILD_ID: LATEST
             MEMORY: 1G
+            ICON: "https://cdn.beno.lol/server_icon.png"
             PLUGINS: |
                 https://github.com/Cubxity/UnifiedMetrics/releases/download/v0.3.8/unifiedmetrics-platform-velocity-0.3.8.jar
                 https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/velocity
