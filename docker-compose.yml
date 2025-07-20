@@ -15,8 +15,8 @@ services:
             - "--api=true"
             - "--api.dashboard=true"
         ports:
-            - "80:80"
-            - "443:443"
+            - "80:80/tcp"
+            - "443:443/tcp"
         environment:
             - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
             - TRAEFIK_AUTH_HASH=${TRAEFIK_AUTH_HASH}
@@ -50,8 +50,8 @@ services:
                 https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/velocity
                 https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/velocity
         ports:
-            - "25565:25565"
-            - "19132:19132"
+            - "25565:25565/tcp"
+            - "19132:19132/udp"
         volumes:
             - ./config/velocity/velocity.toml:/config/velocity.toml:ro
             - ./data/velocity/forwarding.secret:/config/forwarding.secret:ro

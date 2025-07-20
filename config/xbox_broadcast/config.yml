@@ -17,10 +17,10 @@ session:
     # The data to broadcast over xbox live, this is the default if querying is enabled
     session-info:
         host-name: "beno.lol"
-        world-name: "\u00A7aShow \u00A7bme \u00A7f& \u00A7cyour \u00A7fwilly!"
+        world-name: "\u00A7aShow \u00A7bme \u00A7cyour \u00A7fwilly!"
         players: 0
-        max-players: 42069
-        ip: velocity
+        max-players: 128
+        ip: mc.beno.lol
         port: 19132
 
 # Friend/follower list sync settings
