@@ -105,6 +105,7 @@ services:
                 fabricproxy-lite:v2.9.0
                 floodgate:2.2.5-b45
                 bluemap:5.9-fabric
+                postgresql-driver:42.7.4
         volumes:
             - ./config/smp/server.properties:/data/server.properties
             - ./data/smp:/data
@@ -176,6 +177,19 @@ services:
             - "traefik.http.routers.grafana.tls.certresolver=cloudflare"
             - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
+    postgres:
+        image: postgres:16
+        container_name: postgres
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: bluemap
+        volumes:
+            - pg_data:/var/lib/postgresql/data
+        networks:
+            - mugen_net
+
 networks:
     mugen_net:
         driver: bridge
@@ -185,3 +199,4 @@ volumes:
     velocity_data:
     prometheus_data:
     grafana_data:
+    pg_data:
