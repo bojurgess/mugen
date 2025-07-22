@@ -86,6 +86,7 @@ services:
             # Mods to be installed
             MODS: |
                 https://github.com/Cubxity/UnifiedMetrics/releases/download/v0.3.8/unifiedmetrics-platform-fabric-0.3.8.jar
+                https://cdn.modrinth.com/data/NAD1n5gw/versions/JE6q0qLt/postgresql-driver-42.7.4-all.jar
             MODRINTH_PROJECTS: |
                 carpet:1.4.177
                 lithium:mc1.21.7-0.18.0-fabric
@@ -105,7 +106,6 @@ services:
                 fabricproxy-lite:v2.9.0
                 floodgate:2.2.5-b45
                 bluemap:5.9-fabric
-                postgresql-driver:42.7.4
         volumes:
             - ./config/smp/server.properties:/data/server.properties
             - ./data/smp:/data
