@@ -65,15 +65,19 @@ services:
             - smp
 
     smp:
-        image: itzg/minecraft-server:java24
+        image: itzg/minecraft-server:java24-graalvm
         container_name: smp-fabric
         restart: unless-stopped
+        stop_grace_period: 1m30s
         environment:
             EULA: "TRUE"
             TYPE: FABRIC
             VERSION: "1.21.7"
             FABRIC_LOADER_VERSION: LATEST
+            STOP_SERVER_ANNOUNCE_DELAY: 60
             MEMORY: 10G
+            USE_MEOWICE_FLAGS: true
+            USE_MEOWICE_GRAALVM_FLAGS: true
             GAMEMODE: survival
             ONLINE_MODE: "false"
             ENABLE_RCON: "true"
@@ -100,6 +104,7 @@ services:
                 forge-config-api-port:v21.7.0-1.21.7-Fabric
                 fabricproxy-lite:v2.9.0
                 floodgate:2.2.5-b45
+                bluemap:5.9-fabric
         volumes:
             - ./config/smp/server.properties:/data/server.properties
             - ./data/smp:/data
@@ -170,38 +175,6 @@ services:
             - "traefik.http.routers.grafana.entrypoints=websecure"
             - "traefik.http.routers.grafana.tls.certresolver=cloudflare"
             - "traefik.http.services.grafana.loadbalancer.server.port=3000"
-
-    node-exporter:
-        image: prom/node-exporter:latest
-        container_name: node-exporter
-        restart: unless-stopped
-        volumes:
-            - /proc:/host/proc:ro
-            - /sys:/host/sys:ro
-            - /:/rootfs:ro
-        command:
-            - "--path.procfs=/host/proc"
-            - "--path.rootfs=/rootfs"
-            - "--path.sysfs=/host/sys"
-            - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($|/)"
-        networks:
-            - mugen_net
-
-    cadvisor:
-        image: gcr.io/cadvisor/cadvisor:latest
-        container_name: cadvisor
-        restart: unless-stopped
-        volumes:
-            - /:/rootfs:ro
-            - /var/run:/var/run:ro
-            - /sys:/sys:ro
-            - /var/lib/docker/:/var/lib/docker:ro
-            - /dev/disk/:/dev/disk:ro
-        devices:
-            - /dev/kmsg
-        privileged: true
-        networks:
-            - mugen_net
 
 networks:
     mugen_net:
